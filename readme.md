@@ -406,6 +406,7 @@ throughput deployments.
 # [No SQL?](https://www.mongodb.com/nosql-explained)
 
 ## ST-WG (10min): Which database would you choose for?
+
 - Blog: Posts have_many Comments
 - HR app: Companies have_many Managers have_many Employees
 - Gallery: Artists have_many Paintings
@@ -417,3 +418,59 @@ throughput deployments.
 
 - RDBMS
 - Document Database
+
+## We do
+
+```
+$ git init restaurants
+$ cd restaurants
+$ npm init
+$ npm install --save mongodb
+```
+
+```js
+// app.js
+
+var mongo = require("mongodb").MongoClient
+var url = "mongodb://localhost:27017/test"
+
+mongo.connect(url, function(err, db){
+  var collection = db.collection('restaurants');
+  collection.find().toArray(function(err, doc){
+    console.log(doc)
+  })
+})
+```
+
+```
+$ npm install --save prompt-sync
+```
+
+```js
+// app.js
+
+var mongo = require("mongodb").MongoClient
+var url = "mongodb://localhost:27017/test"
+
+mongo.connect(url, function(err, db){
+  var collection = db.collection('restaurants');
+  var number = prompt("Type 1 and press enter to display all restaurants' names: ")
+  if(number == "1"){
+    collection.find().toArray(function(err, doc){
+      console.log(doc)
+    })
+  }
+})
+```
+
+## You do:
+
+Add another prompt to let the user view more information about a restuarant.
+
+### Bonus!
+
+Allow users to add their own restaurants
+
+### Double Bonus!
+
+Allow users to edit/delete restaurants
