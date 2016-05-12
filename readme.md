@@ -1,37 +1,36 @@
 # MongoDB
+
+
 ## Learning Objectives
 
-- Compare and contrast relational to document based (NoSql)
+- Compare and contrast relational to document based (NoSql) databases
 - Setup local mongo db server
 - CRUD documents using mongo CLI
 - Build a simple node CLI to query mongodb
 
-## Opening
+## Framing
 
 Well, we've come full circle ... again. What we're learning today isn't
 fundamentally that different from what we know. We're going to learn a
-different way to store information. A document-based non-relational way. We've
-learned a considerable amount of information about relational databases.
-We join on foreign keys in relational databases in order to query our database
-. Sometimes these joins can get really expensive to query the database. When
-dealing with less complex associations, non relational databases can be more
-effective. We've also seen that schema's in SQL(relational DB's) are fairly
-rigid. Adding columns can be taxing(migrations). Also if we delete a row in a
-table that is being used as a foreign key in another table, we must delete
-all the rows associated with that foreign key before we can delete the parent
-object. Mongo provides a more flexible, scalable solution for less complex
-domain models.
+different way to store information. This time, via a document-based, non-relational way.
+
+We've learned a considerable amount of information about relational databases with Postgres. We've seen that schema's in SQL(relational DB's) are fairly rigid. Adding columns can be taxing(migrations). Also if we delete a row in a table that is being used as a foreign key in another table, we must delete all the rows associated with that foreign key before we can delete the parent object. With SQL, we can also join on foreign keys for relational tables in order to query our database. One of the negatives about these join queries, is that they can get really expensive and therefore slow down our app.
+
+**When dealing with less complex associations, non relational databases can be more
+effective**.  Mongo provides a more flexible, scalable solution for less complex
+domain models. Another takeaway is that SQL databases validate your data and any updates to records, but that makes them very strict. NoSQL databases are more flexible but won't validate data.
 
 > This is not to say that mongo is a better solution than postgres or other
 SQL libraries, but an alternative solution.
-
 
 MongoDB is an open-source **document database** that provides:
 - High Performance
 - High Availability
 - Automatic Scaling
 
-## Document Database?
+In a nutshell, you should use Mongo if you are working with a flexible data model, that involves similar, but different objects.
+
+## [Document Database](https://docs.mongodb.com/manual/introduction/)?
 
 ### A basic example of a `Person` document:
 
@@ -82,9 +81,7 @@ TPS: What do you see?
 }
 ```
 
-## Documentation
-
-https://www.mongodb.org
+[Documentation](https://www.mongodb.org)
 
 ## Documents
 
@@ -112,18 +109,18 @@ as a primary key.
 ### Start mongo:
 
 ```
-mongod --config /usr/local/etc/mongod.conf
+$ mongod
 ```
 
 You should see:
 
-`nothing`
-> no news is good news
+`a bunch of output but with the prompt hanging`
+> This is good news, `mongod` just starts up a mongo server locally. **NOTE**: you need this running in order to use the mongo cli
 
 ### More info?
 
 ```
-brew info mongo
+$ brew info mongo
 ```
 
 ## Mongo shell
@@ -150,11 +147,14 @@ connecting to: test
 help
 ```
 
-ThinkShare (2min):
+#### ThinkShare (2min):
+Based on what you see in the help menu:
 - What jumps out as important?
-- Try it
+- What might be some uses for what you see?
 
-## What jumped out to me
+---
+
+### What jumped out to me:
 - `show dbs`: show database names
 - `show collections`:  show collections in current database
 - `use <db_name>`: set current database
@@ -165,24 +165,32 @@ Also:
 - `<tab>` key completion
 - `<up-arrow>` and the `<down-arrow>` for history.
 
-In the mongo REPL we want to connect to create/connect to a database.
+### CLI: Creating a Database
 
-We *want* to work with the `restaurants` database:
+In the mongo REPL, let's go ahead and create our first database, one which we will be using to store information about restaurants.
+
+In order to create/connect to a new database, we have to tell mongo to `use` a specific database that we want to work with:
 
 ```
-use restaurant_db
+> use restaurant_db
 ```
+> **Note**: `use` will create the database it received as an argument if not already initialized and connect to it
 
 Verify:
 ```
 > db
 restaurant_db
 ```
+> **Note**: the `db` variable is provided by mongo and will point to the currently connected database
 
-Common Mistake:
-`show dbs`
-> note we don't see restaurants listed. It isn't until we add a document to
-our database does it list the DB in `show dbs`
+Common Gotcha, what happens when we run:
+
+```
+$ show dbs
+```
+
+> **Note** we don't see `restaurant_db` listed. It isn't until we add a document to
+our database that our  db will show up in `show dbs`
 
 ## CLI: Create a record
 
@@ -193,18 +201,19 @@ our database does it list the DB in `show dbs`
 ### Insert a restaurant
 
 ``` json
-db.restaurants.insert(
+> db.restaurants.insert(
    {
-      name: "Cookies Corner",
+      "name": "Cookies Corner",
       "address" : {
          "street" : "1970 2nd St NW",
          "zipcode" : 20001,
       },
-      yelp: "http://www.yelp.com/biz/cookies-corner-washington",
-});
+      "yelp": "http://www.yelp.com/biz/cookies-corner-washington"
+   })
 ```
 
-> The db is the database we’re connected to. In this case, `restaurant_db`.
+**Important to note**:
+> The `db` is the database we’re connected to. In this case, `restaurant_db`.
 `.restaurants` is then referring to a collection in our `restaurant_db`. We
 use the `.insert()` to add the document inside the parentheses.
 
@@ -214,7 +223,7 @@ use the `.insert()` to add the document inside the parentheses.
 restaurants
 system.indexes
 ```
-Note: restaurants
+Note: `restaurants` was saved as a collection
 
 ```
 > db.restaurants.find()
@@ -239,9 +248,7 @@ db.your_collection_name.find()
 ```
 
 New Record:
-- If the document passed to the insert() method does not contain the _id field
-, the mongo shell automatically adds the field to the document and sets the
-field’s value to a generated ObjectId.
+- If the document passed to the `insert()` method does not contain the `_id` field the mongo shell automatically adds the field to the document and sets the field’s value to a generated `ObjectId`.
 
 New collection:
 - If you attempt to add documents to a collection that does not exist,
@@ -250,7 +257,7 @@ MongoDB will create the collection for you.
 ## Dropping a Database
 
 ```
-use milk-n-cookies
+use random_db
 db.dropDatabase()
 ```
 
@@ -258,8 +265,16 @@ Drops the **current** database.
 
 ### Exercise (5 minutes): Add a few more restaurants.
 
-ProTip: I recommend you construct your statements in your editor and copy/
-paste.  It will help you now & later.
+Using the Mongo Shell CLI, add at least 3 new restaurant documents to your `restaurants` collection.
+
+**ProTip**: I recommend you construct your statements in your editor and copy/
+paste. It will help you now & later.
+
+---
+
+## Break
+
+---
 
 > Prompt: Did anyone insert multiple at one time?
 
@@ -273,24 +288,51 @@ db
 2. Use the appropriate DB
 3. Insert multiple restaurants
 
-``` mongo
+``` json
 db.restaurants.remove({});
 db.restaurants.insert([
   {
-      name: "Cookies Corner",
-      "address" : {
-         "street" : "1970 2nd St NW",
-         "zipcode" : 20001,
-      },
-      yelp: "http://www.yelp.com/biz/cookies-corner-washington"
+    "name": "Cookies Corner",
+    "address": {
+      "street" : "1970 2nd St NW",
+      "zipcode" : 20001
+    },
+    "yelp": "http://www.yelp.com/biz/cookies-corner-washington"
   },
-  { name: "The Blind Dog Cafe", address: { street: "944 Florida Ave",
-        zipcode: 20001 }, yelp: "http://www.yelp.com/biz/the-blind-dog-cafe-washington-2?osq=cookies" },
-  {name: "Birch & Barley", address: { street: "1337 14th St NW", zipcode: 20005}, yelp: "http://www.yelp.com/biz/birch-and-barley-washington?osq=Restaurants+cookies"},
-  {name: "Captain Cookie and the Milk Man", address: { street: "Dupont Circle", zipcode: 20036 }, yelp: "http://www.yelp.com/biz/captain-cookie-and-the-milk-man-washington-5" },
-  {name: "J’s Cookies", address: { street: "1700 N Moore St", zipcode: 22209}, yelp: "http://www.yelp.com/biz/js-cookies-arlington" }
+  {
+    "name": "The Blind Dog Cafe",
+    "address": {
+      "street": "944 Florida Ave",
+      "zipcode": 20001
+    },
+    "yelp": "http://www.yelp.com/biz/the-blind-dog-cafe-washington-2?osq=cookies"
+  },
+  {
+    "name": "Birch & Barley",
+    "address": {
+      "street": "1337 14th St NW",
+      "zipcode": 20005
+    },
+    "yelp": "http://www.yelp.com/biz/birch-and-barley-washington?osq=Restaurants+cookies"
+  },
+  {
+    "name": "Captain Cookie and the Milk Man",
+    "address": {
+      "street": "Dupont Circle",
+      "zipcode": 20036
+    },
+    "yelp": "http://www.yelp.com/biz/captain-cookie-and-the-milk-man-washington-5"
+  },
+  {
+    "name": "J’s Cookies",
+    "address": {
+      "street": "1700 N Moore St",
+      "zipcode": 22209
+    },
+    "yelp": "http://www.yelp.com/biz/js-cookies-arlington" }
 ])
-db.restaurants.count()
+
+> db.restaurants.count()
 ```
 
 ## [Primary key](http://docs.mongodb.org/manual/reference/glossary/#term-primary-key)
@@ -299,73 +341,77 @@ db.restaurants.count()
 - RDBMS: usually *id* field, typically an *Integer*
 - MongoDB: the *_id* field, usually a *[BSON](http://docs.mongodb.org/manual/reference/glossary/#term-bson) [ObjectId](http://docs.mongodb.org/manual/reference/glossary/#term-objectid)*.
 
-## CLI: Find records
+## CLI: QUERY for Records
 
-Find all:
-```mongo
-db.restaurants.find()
+Breaking down the anatomy of a typical query with Mongo:
+
+collection + operation + modification = results
+
+![mongo-queries](https://docs.mongodb.com/manual/_images/crud-query-stages.png)
+
+In order to Find all restaurants:
+```bash
+> db.restaurants.find()
 ```
 
-### Find by Conditions (like `where`)
+### Find by Conditions (like SQL's `where`)
 
-Key: Value pairs
-```mongo
-db.restaurants.find({name: "Cookies Corner"});
-db.restaurants.find({"address.zipcode": 20001});
+We can add conditions to our query to target documents based on matching key-value pairs:
+
+```bash
+> db.restaurants.find({name: "Cookies Corner"});
+> db.restaurants.find({"address.zipcode": 20001});
 ```
 
-## Helpful References
-- [Mongo to SQL Mapping Chart](http://docs.mongodb.org/manual/reference/sql-comparison/)
-- [CRUD Intro](http://docs.mongodb.org/manual/core/crud-introduction/)
-- [CRUD Commands](http://docs.mongodb.org/manual/reference/crud/)
-- [bios Collection](http://docs.mongodb.org/manual/reference/bios-example-collection/)
-
-
-## CLI: Update a record(s)
+### CLI: Update a record(s)
 
 http://docs.mongodb.org/manual/core/write-operations-introduction/
 
 ```
 > db.your_collection.update(
-  { criteria }, 
+  { criteria },
   { $set: { assignments }},
   { options }
 )
 ```
 
+> **Note**: the first key value pair is the condition on which to find the document you'd like to update, the second
+is what values you'd like to set, and third is any additional options
+
 ### You do (10 min):
 
-Update a restaurants to have a new key-value par `{state: "DC"}`
+Take time to think about and execute the appropriate commands so that you:
 
+- Update all restaurants to have a new key-value pair `{state: "DC"}`
+- Add a property of `rating` to at least 2 documents and give it a numerical value between 1-5
+- Change the street `address` of a specific restaurant
+
+---
+
+> **Note** this what a sample update might look like:
 ```
 > db.restaurants.update(
   {"name": "Cookies Corner"},
   { $set: { state: "DC" }}
 )
 ```
-```
-WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
-```
-
-> the first key value pair find the document you'd like to update, the second
-is what values you'd like to set and third is any additional options
 
 Verify:
 ```
 > db.restaurants.find()
 ```
 
-## CLI: Remove records
+### CLI: Remove records
 
 ```
 db.restaurants.remove({ conditions })
 ```
 
-## CLI: Add a nested object
+### CLI: Add a nested object
 
 > We already did this! (The address 'object' / 'subdocument')
 
-## Key Advantages
+## Closing: Review Mongo's Key Advantages
 
 - Usability
 - High Performance
@@ -403,48 +449,70 @@ redundancy and increasing data availability.
 - Replica sets can provide eventually-consistent reads for low-latency high
 throughput deployments.
 
-# [No SQL?](https://www.mongodb.com/nosql-explained)
+> Interested in learning more about [No SQL?](https://www.mongodb.com/nosql-explained)
 
-## ST-WG (10min): Which database would you choose for?
+### TPS (5mins): Which database would you choose for?
 
+ What database type would make sense for the following apps:
 - Blog: Posts have_many Comments
 - HR app: Companies have_many Managers have_many Employees
 - Gallery: Artists have_many Paintings
 
-## Come up with your own examples, for both
+---
 
+## Break
 
-## Vote for your best example for:
+---
 
-- RDBMS
-- Document Database
+## Bonus Exercise
 
-## We do
+### (We Do) Build a CLI Mongo App w/ Node
 
-```
-$ git init restaurants
-$ cd restaurants
+Great, now that we have had some good practice with Mongo, let's connect to the
+`restaurant_db` we just setup via the `mongodb` node module and build a little
+CLI app that will allow a user to enter commands to query our database.
+
+Let's start by creating our app directory and main `js` file.
+Then we will install the `mongodb` node module
+
+```bash
+$ mkdir restaurants_cli
+$ cd restaurants_cli
+$ touch app.js
 $ npm init
 $ npm install --save mongodb
 ```
+
+Great, now let's use an instance of the MongoClient to connect to our `restaurant_db` and search for all restaurants
 
 ```js
 // app.js
 
 var mongo = require("mongodb").MongoClient
-var url = "mongodb://localhost:27017/test"
+var url = "mongodb://localhost:27017/restaurant_db"
 
 mongo.connect(url, function(err, db){
   var collection = db.collection('restaurants');
-  collection.find().toArray(function(err, doc){
-    console.log(doc)
+  collection.find().toArray(function(err, docs){
+    console.log(docs)
   })
 })
 ```
 
+If you see all the documents outputed to your server logs, you're in great shape!
+> If not, double check your connection url and that your database is in fact there and populated!
+
+Now, let's add in the functionality to prompt the user for some input.
+
+To do that, we are going to use a node module that will allow us to use the `prompt`
+method, much like how we used it w/ front-end JS in the browser.
+
 ```
 $ npm install --save prompt-sync
 ```
+
+Now let's create a little menu prompt that will return all documents in our collection
+if the user enters in the right input:
 
 ```js
 // app.js
@@ -465,7 +533,7 @@ mongo.connect(url, function(err, db){
 
 ## You do:
 
-Add another prompt to let the user view more information about a restuarant.
+Add another prompt to let the user view more information about a restaurant.
 
 ### Bonus!
 
@@ -474,3 +542,10 @@ Allow users to add their own restaurants
 ### Double Bonus!
 
 Allow users to edit/delete restaurants
+
+## Helpful References
+
+- [Mongo to SQL Mapping Chart](http://docs.mongodb.org/manual/reference/sql-comparison/)
+- [CRUD Intro](http://docs.mongodb.org/manual/core/crud-introduction/)
+- [CRUD Commands](http://docs.mongodb.org/manual/reference/crud/)
+- [bios Collection](http://docs.mongodb.org/manual/reference/bios-example-collection/)
