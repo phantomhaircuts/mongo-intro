@@ -1,12 +1,14 @@
 # MongoDB
 
+![Mongo-logo](http://www.screen-i.com/blog/wp-content/uploads/2015/07/mongodb-standard-logo-565.png)
 
 ## Learning Objectives
 
 - Compare and contrast relational to document based (NoSql) databases
-- Setup local mongo db server
-- CRUD documents using mongo CLI
-- Build a simple node CLI to query mongodb
+- Setup local MongoDB server
+- Define what a document is in the context of MongoDB
+- CRUD documents using Mongo CLI
+- Build a simple node CLI to query MongoDB
 
 ## Framing
 
@@ -18,9 +20,9 @@ We've learned a considerable amount of information about relational databases wi
 
 **When dealing with less complex associations, non relational databases can be more
 effective**.  Mongo provides a more flexible, scalable solution for less complex
-domain models. Another takeaway is that SQL databases validate your data and any updates to records, but that makes them very strict. NoSQL databases are more flexible but won't validate data.
+domain models.
 
-> This is not to say that mongo is a better solution than postgres or other
+> This is not to say that Mongo is a better solution than Postgres or other
 SQL libraries, but an alternative solution.
 
 MongoDB is an open-source **document database** that provides:
@@ -86,6 +88,7 @@ TPS: What do you see?
 ## Documents
 
 ### A record in MongoDB is a document
+![mongo-document](https://docs.mongodb.com/manual/_images/crud-annotated-document.png)
 
 - a data structure composed of field(key) and value pairs.
   - similar to JSON objects.
@@ -97,10 +100,21 @@ TPS: What do you see?
 
 MongoDB stores documents in collections.
 
+![mongo-collections](https://docs.mongodb.com/manual/_images/crud-annotated-collection.png)
+
 - Collections are analogous to tables in relational databases.
 - does **NOT** require its documents to have the same schema.
 - documents stored in a collection must have a unique `_id` field that acts
 as a primary key.
+
+###  MongoDB & NoSQL vs. SQL and Relational Databases
+
+    A SQL  ___________          ...is like...          A Mongo  ____________
+![mongo-sql-compared](http://4.bp.blogspot.com/-edz2_QrFvCE/UnzBhKZE3FI/AAAAAAAAAEs/bTEsqnZFTXw/s1600/SQL-MongoDB+Correspondence.PNG)
+
+---
+
+Great, now that we have a high level understanding of what Mongo is and what purpose it serves, let's look at how to use it!
 
 ## Installation
 - [Mac OS X](https://docs.mongodb.org/getting-started/shell/tutorial/install-mongodb-on-os-x/)
@@ -136,7 +150,7 @@ $ mongo
 You should see:
 
 ```
-MongoDB shell version: 3.0.3
+MongoDB shell version: 3.x.x
 connecting to: test
 >
 ```
@@ -144,13 +158,13 @@ connecting to: test
 ### Help
 
 ```
-help
+> help
 ```
 
 #### ThinkShare (2min):
 Based on what you see in the help menu:
 - What jumps out as important?
-- What might be some uses for what you see?
+- What might be useful for debugging?
 
 ---
 
@@ -167,7 +181,7 @@ Also:
 
 ### CLI: Creating a Database
 
-In the mongo REPL, let's go ahead and create our first database, one which we will be using to store information about restaurants.
+In the Mongo REPL, let's go ahead and create our first database, one which we will be using to store information about restaurants.
 
 In order to create/connect to a new database, we have to tell mongo to `use` a specific database that we want to work with:
 
@@ -218,20 +232,21 @@ our database that our  db will show up in `show dbs`
 use the `.insert()` to add the document inside the parentheses.
 
 ### Verify the insert
-```
+```bash
 > show collections
 restaurants
-system.indexes
 ```
+
 Note: `restaurants` was saved as a collection
 
-```
+```js
 > db.restaurants.find()
 ```
 
-- name
-- address
-- yelp
+Returns documents with the following fields:
+- `name`
+- `address`
+- `yelp`
 
 What is surprising/unexpected?
 
@@ -240,11 +255,11 @@ What is surprising/unexpected?
 - [ObjectId](https://docs.mongodb.org/manual/reference/object-id/)
 
 ## Review `insert`
-```
+```js
 // insert
-db.your_collection_name.insert({ data as json })
+> db.your_collection_name.insert({ data as json })
 // find
-db.your_collection_name.find()
+> db.your_collection_name.find()
 ```
 
 New Record:
@@ -256,9 +271,9 @@ MongoDB will create the collection for you.
 
 ## Dropping a Database
 
-```
-use random_db
-db.dropDatabase()
+```bash
+> use random_db
+> db.dropDatabase()
 ```
 
 Drops the **current** database.
@@ -279,10 +294,9 @@ paste. It will help you now & later.
 > Prompt: Did anyone insert multiple at one time?
 
 Let's recreate the steps together:
-Where are we now?
-```
-db
-```
+
+**Q**. How can we tell which database we are connected to currently?
+> `db`
 
 1. Create DB
 2. Use the appropriate DB
@@ -370,7 +384,9 @@ http://docs.mongodb.org/manual/core/write-operations-introduction/
 ```
 > db.your_collection.update(
   { criteria },
-  { $set: { assignments }},
+  {
+    $set: { assignments }
+  },
   { options }
 )
 ```
@@ -389,6 +405,7 @@ Take time to think about and execute the appropriate commands so that you:
 ---
 
 > **Note** this what a sample update might look like:
+
 ```
 > db.restaurants.update(
   {"name": "Cookies Corner"},
@@ -404,7 +421,7 @@ Verify:
 ### CLI: Remove records
 
 ```
-db.restaurants.remove({ conditions })
+> db.restaurants.remove({ conditions })
 ```
 
 ### CLI: Add a nested object
