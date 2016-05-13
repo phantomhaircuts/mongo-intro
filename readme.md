@@ -109,7 +109,7 @@ as a primary key.
 
 ###  MongoDB & NoSQL vs. SQL and Relational Databases
 
-    A SQL  ___________          ...is like...          A Mongo  ____________
+    A SQL  ___________            ...is like...           A Mongo  ____________
 ![mongo-sql-compared](http://4.bp.blogspot.com/-edz2_QrFvCE/UnzBhKZE3FI/AAAAAAAAAEs/bTEsqnZFTXw/s1600/SQL-MongoDB+Correspondence.PNG)
 
 ---
@@ -248,9 +248,9 @@ Returns documents with the following fields:
 - `address`
 - `yelp`
 
-What is surprising/unexpected?
+**Q**. What is surprising/unexpected?
 
-- where did restaurants come from?
+- where did `restaurants` come from?
 - `_id`?
 - [ObjectId](https://docs.mongodb.org/manual/reference/object-id/)
 
@@ -280,9 +280,9 @@ Drops the **current** database.
 
 ### Exercise (5 minutes): Add a few more restaurants.
 
-Using the Mongo Shell CLI, add at least 3 new restaurant documents to your `restaurants` collection.
+Using the Mongo Shell CLI, add at least 4 new restaurant documents to your `restaurants` collection.
 
-**ProTip**: I recommend you construct your statements in your editor and copy/
+**ProTip**: I recommend you construct your statements in your editor and copy /
 paste. It will help you now & later.
 
 ---
@@ -338,7 +338,7 @@ db.restaurants.insert([
     "yelp": "http://www.yelp.com/biz/captain-cookie-and-the-milk-man-washington-5"
   },
   {
-    "name": "J’s Cookies",
+    "name": "J's Cookies",
     "address": {
       "street": "1700 N Moore St",
       "zipcode": 22209
@@ -352,27 +352,29 @@ db.restaurants.insert([
 ## [Primary key](http://docs.mongodb.org/manual/reference/glossary/#term-primary-key)
 
 - A record’s unique immutable identifier.
-- RDBMS: usually *id* field, typically an *Integer*
-- MongoDB: the *_id* field, usually a *[BSON](http://docs.mongodb.org/manual/reference/glossary/#term-bson) [ObjectId](http://docs.mongodb.org/manual/reference/glossary/#term-objectid)*.
+- In relational databases: usually *id* field, typically an *Integer*
+- In MongoDB: the *_id* field, usually a *[BSON](http://docs.mongodb.org/manual/reference/glossary/#term-bson) [ObjectId](http://docs.mongodb.org/manual/reference/glossary/#term-objectid)*.
 
 ## CLI: QUERY for Records
 
 Breaking down the anatomy of a typical query with Mongo:
 
-collection + operation + modification = results
+   collection + operation + modification = results
 
 ![mongo-queries](https://docs.mongodb.com/manual/_images/crud-query-stages.png)
 
 In order to Find all restaurants:
-```bash
+```js
 > db.restaurants.find()
 ```
+
+> **Note**: we can format our output to be a little nicer on the eyes by chaining the `.pretty()` method to end of our query like so: `db.restaurants.find().pretty()`
 
 ### Find by Conditions (like SQL's `where`)
 
 We can add conditions to our query to target documents based on matching key-value pairs:
 
-```bash
+```js
 > db.restaurants.find({name: "Cookies Corner"});
 > db.restaurants.find({"address.zipcode": 20001});
 ```
@@ -402,20 +404,36 @@ Take time to think about and execute the appropriate commands so that you:
 - Add a property of `rating` to at least 2 documents and give it a numerical value between 1-5
 - Change the street `address` of a specific restaurant
 
+**Bonus**
+- Add nested sub-documents to each restaurant to that it has many `reviews`
+- Store important information about each `review`
 ---
 
 > **Note** this what a sample update might look like:
 
-```
+```js
 > db.restaurants.update(
   {"name": "Cookies Corner"},
   { $set: { state: "DC" }}
 )
 ```
 
-Verify:
+> **Note**: In order to update multiple documents at a time, make sure to pass the `multi` option as true, like so:
+
+```js
+db.restaurants.update(
+  {},
+  {
+    $set: { "state": "DC" }
+  },
+  {multi: true}
+)
 ```
-> db.restaurants.find()
+
+Verify:
+
+```js
+> db.restaurants.find().pretty()
 ```
 
 ### CLI: Remove records
