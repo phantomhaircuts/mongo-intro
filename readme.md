@@ -92,7 +92,7 @@ TPS: What do you see?
 
 - a data structure composed of field(key) and value pairs.
   - similar to JSON objects.
-  - stored as BJSON
+  - stored as BSON
 - fields may include other documents, arrays, and arrays of documents.
 - analogous to rows in a table
 
